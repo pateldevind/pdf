@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotate PDF - Multi-Tools Website</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <h1 class="text-center mb-4">Rotate PDF</h1>
+            
+            <!-- File Upload Section -->
+            <div class="upload-section card mb-4">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Select PDF File</label>
+                        <input type="file" class="form-control" id="fileInput" accept=".pdf">
+                        <div class="form-text">Maximum file size: 50MB</div>
+                    </div>
+
+                    <!-- Rotation Options -->
+                    <div class="mb-3">
+                        <h5>Rotation Options</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="rotationScope" id="allPages" value="all" checked>
+                            <label class="form-check-label" for="allPages">
+                                Rotate all pages
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="rotationScope" id="specificPages" value="specific">
+                            <label class="form-check-label" for="specificPages">
+                                Rotate specific pages
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Page Range Input -->
+                    <div id="pageRangeSection" class="mb-3" style="display: none;">
+                        <label for="pageRange" class="form-label">Page Range</label>
+                        <input type="text" class="form-control" id="pageRange" placeholder="e.g., 1,3-5,7">
+                        <div class="form-text">Enter page numbers or ranges (e.g., 1,3-5,7)</div>
+                    </div>
+
+                    <!-- Rotation Angle -->
+                    <div class="mb-3">
+                        <label for="rotationAngle" class="form-label">Rotation Angle</label>
+                        <select class="form-select" id="rotationAngle">
+                            <option value="90">90° Clockwise</option>
+                            <option value="180">180°</option>
+                            <option value="270">90° Counter-clockwise</option>
+                        </select>
+                    </div>
+
+                    <!-- File Information -->
+                    <div id="fileInfo" class="mb-3" style="display: none;">
+                        <h5>File Information:</h5>
+                        <p>Name: <span id="fileName"></span></p>
+                        <p>Size: <span id="fileSize"></span></p>
+                        <p>Pages: <span id="pageCount"></span></p>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loadingIndicator" class="text-center" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Rotating your PDF...</p>
+                    </div>
+
+                    <!-- Convert Button -->
+                    <button id="convertBtn" class="btn btn-primary w-100" disabled>
+                        <i class="fas fa-sync me-2"></i>Rotate PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-section card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">How to Rotate PDF</h5>
+                    <ol>
+                        <li>Upload your PDF file</li>
+                        <li>Choose whether to rotate all pages or specific pages</li>
+                        <li>If rotating specific pages, enter the page numbers or ranges</li>
+                        <li>Select the rotation angle (90° clockwise, 180°, or 90° counter-clockwise)</li>
+                        <li>Click "Rotate PDF" to process your file</li>
+                        <li>Download your rotated PDF when ready</li>
+                    </ol>
+                    <div class="alert alert-info">
+                        <h6>Important Notes:</h6>
+                        <ul class="mb-0">
+                            <li>Maximum file size: 50MB</li>
+                            <li>Page numbers start from 1</li>
+                            <li>You can specify individual pages or ranges (e.g., 1,3-5,7)</li>
+                            <li>The original file will not be modified</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section -->
+            <div class="ad-section text-center my-4">
+                <div class="ad-placeholder">
+                    <!-- Ad Space -->
+                    <div class="ad-banner">
+                        Advertisement Space
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const convertBtn = document.getElementById('convertBtn');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const pageCount = document.getElementById('pageCount');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const rotationScope = document.getElementsByName('rotationScope');
+            const pageRangeSection = document.getElementById('pageRangeSection');
+            const pageRange = document.getElementById('pageRange');
+            const rotationAngle = document.getElementById('rotationAngle');
+
+            // Handle rotation scope selection
+            rotationScope.forEach(input => {
+                input.addEventListener('change', function() {
+                    pageRangeSection.style.display = this.value === 'specific' ? 'block' : 'none';
+                });
+            });
+
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    if (!file.name.toLowerCase().endsWith('.pdf')) {
+                        showError('Please select a valid PDF file');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Validate file size (50MB max)
+                    if (file.size > 50 * 1024 * 1024) {
+                        showError('File size exceeds 50MB limit');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Show file information
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    fileInfo.style.display = 'block';
+                    convertBtn.disabled = false;
+                    hideError();
+                    hideSuccess();
+                } else {
+                    fileInfo.style.display = 'none';
+                    convertBtn.disabled = true;
+                }
+            });
+
+            // Handle conversion
+            convertBtn.addEventListener('click', function() {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('rotation_angle', rotationAngle.value);
+                formData.append('rotation_scope', document.querySelector('input[name="rotationScope"]:checked').value);
+                
+                if (document.querySelector('input[name="rotationScope"]:checked').value === 'specific') {
+                    formData.append('page_range', pageRange.value);
+                }
+
+                // Show loading indicator
+                loadingIndicator.style.display = 'block';
+                convertBtn.disabled = true;
+                hideError();
+                hideSuccess();
+
+                // Send conversion request
+                fetch('/rotate-pdf', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Rotation failed');
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name.replace('.pdf', '_rotated.pdf');
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    showSuccess('PDF rotation successful! Your file is downloading...');
+                })
+                .catch(error => {
+                    showError('An error occurred during rotation. Please try again.');
+                    console.error('Rotation error:', error);
+                })
+                .finally(() => {
+                    loadingIndicator.style.display = 'none';
+                    convertBtn.disabled = false;
+                });
+            });
+
+            // Utility functions
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+            }
+
+            function hideSuccess() {
+                successMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

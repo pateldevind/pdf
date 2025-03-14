@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - PDF Tools Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #4f46e5;
+            --accent-color: #06b6d4;
+            --background-light: #ffffff;
+            --text-light: #1f2937;
+            --border-light: #e5e7eb;
+        }
+
+        [data-bs-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #6366f1;
+            --accent-color: #22d3ee;
+            --background-light: #1f2937;
+            --text-light: #f3f4f6;
+            --border-light: #374151;
+        }
+
+        body {
+            background-color: var(--background-light);
+            color: var(--text-light);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-container {
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            background: var(--background-light);
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-light);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-bs-theme="dark"] .theme-toggle {
+            background: rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .password-requirements {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .requirement i {
+            font-size: 0.75rem;
+        }
+
+        .requirement.valid {
+            color: #10b981;
+        }
+
+        .requirement.invalid {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle btn">
+        <i class="fas fa-sun"></i>
+        <span class="ms-2">Light Mode</span>
+    </button>
+
+    <!-- Registration Form -->
+    <div class="register-container">
+        <h2 class="text-center mb-4">Create an Account</h2>
+        <div id="error-message" class="alert" style="display: none;"></div>
+        <form id="registerForm" onsubmit="handleRegistration(event)">
+            <div class="row mb-3">
+                <div class="col">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstName" required>
+                </div>
+                <div class="col">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" required onkeyup="checkPassword()">
+                <div class="password-requirements mt-2">
+                    <div class="requirement" id="length">
+                        <i class="fas fa-times-circle"></i>
+                        <span>At least 8 characters</span>
+                    </div>
+                    <div class="requirement" id="uppercase">
+                        <i class="fas fa-times-circle"></i>
+                        <span>One uppercase letter</span>
+                    </div>
+                    <div class="requirement" id="lowercase">
+                        <i class="fas fa-times-circle"></i>
+                        <span>One lowercase letter</span>
+                    </div>
+                    <div class="requirement" id="number">
+                        <i class="fas fa-times-circle"></i>
+                        <span>One number</span>
+                    </div>
+                    <div class="requirement" id="special">
+                        <i class="fas fa-times-circle"></i>
+                        <span>One special character</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" required onkeyup="checkPasswordMatch()">
+                <div class="password-requirements mt-2">
+                    <div class="requirement" id="match">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Passwords match</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms" required>
+                <label class="form-check-label" for="terms">
+                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Register</button>
+            <p class="text-center mb-0">
+                Already have an account? <a href="/">Login here</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const html = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+        const text = themeToggle.querySelector('span');
+
+        function setTheme(theme) {
+            html.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            if (theme === 'dark') {
+                icon.className = 'fas fa-moon';
+                text.textContent = 'Dark Mode';
+            } else {
+                icon.className = 'fas fa-sun';
+                text.textContent = 'Light Mode';
+            }
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-bs-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        // Password validation
+        function checkPassword() {
+            const password = document.getElementById('password').value;
+            
+            // Update requirements
+            updateRequirement('length', password.length >= 8);
+            updateRequirement('uppercase', /[A-Z]/.test(password));
+            updateRequirement('lowercase', /[a-z]/.test(password));
+            updateRequirement('number', /[0-9]/.test(password));
+            updateRequirement('special', /[!@#$%^&*]/.test(password));
+            
+            // Check password match if confirm password is not empty
+            const confirmPassword = document.getElementById('confirmPassword');
+            if (confirmPassword.value) {
+                checkPasswordMatch();
+            }
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            updateRequirement('match', password === confirmPassword && password !== '');
+        }
+
+        function updateRequirement(id, valid) {
+            const requirement = document.getElementById(id);
+            const icon = requirement.querySelector('i');
+            
+            if (valid) {
+                requirement.classList.add('valid');
+                requirement.classList.remove('invalid');
+                icon.className = 'fas fa-check-circle';
+            } else {
+                requirement.classList.add('invalid');
+                requirement.classList.remove('valid');
+                icon.className = 'fas fa-times-circle';
+            }
+        }
+
+        // Handle registration
+        async function handleRegistration(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const firstName = form.querySelector('#firstName').value;
+            const lastName = form.querySelector('#lastName').value;
+            const email = form.querySelector('#email').value;
+            const password = form.querySelector('#password').value;
+            const confirmPassword = form.querySelector('#confirmPassword').value;
+            
+            // Password validation
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccess('Registration successful! Redirecting to login...');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showError(data.error || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showError('Registration failed. Please try again.');
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.color = '#dc3545';
+        }
+        
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.color = '#198754';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPG to PDF - PDF Tools Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #4f46e5;
+            --accent-color: #06b6d4;
+            --background-light: #ffffff;
+            --text-light: #1f2937;
+            --border-light: #e5e7eb;
+        }
+
+        [data-bs-theme="dark"] {
+            --primary-color: #3b82f6;
+            --secondary-color: #6366f1;
+            --accent-color: #22d3ee;
+            --background-light: #1f2937;
+            --text-light: #f3f4f6;
+            --border-light: #374151;
+        }
+
+        body {
+            background-color: var(--background-light);
+            color: var(--text-light);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .tool-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--background-light);
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .drag-drop-area {
+            border: 2px dashed var(--border-light);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .drag-drop-area:hover {
+            border-color: var(--primary-color);
+        }
+
+        .drag-drop-area.dragover {
+            background-color: rgba(37, 99, 235, 0.1);
+            border-color: var(--primary-color);
+        }
+
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .settings-container {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tool-container">
+            <h2 class="text-center mb-4">JPG to PDF Converter</h2>
+            <div class="drag-drop-area" id="dropZone">
+                <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                <h4>Drag and drop your images here</h4>
+                <p>or</p>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    Select Files
+                </button>
+                <input type="file" id="fileInput" multiple accept=".jpg,.jpeg" style="display: none">
+            </div>
+
+            <div class="preview-container" id="previewContainer"></div>
+
+            <div class="settings-container">
+                <h4 class="mb-3">Settings</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="pageSize" class="form-label">Page Size</label>
+                        <select class="form-select" id="pageSize">
+                            <option value="a4">A4</option>
+                            <option value="letter">Letter</option>
+                            <option value="legal">Legal</option>
+                            <option value="fit">Fit to Image</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="orientation" class="form-label">Orientation</label>
+                        <select class="form-select" id="orientation">
+                            <option value="auto">Auto</option>
+                            <option value="portrait">Portrait</option>
+                            <option value="landscape">Landscape</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary w-100" id="convertBtn" disabled>
+                    Convert to PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const convertBtn = document.getElementById('convertBtn');
+        let selectedFiles = [];
+
+        // Drag and drop handlers
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            const validFiles = Array.from(files).filter(file => 
+                file.type === 'image/jpeg' || file.type === 'image/jpg'
+            );
+
+            if (validFiles.length === 0) {
+                alert('Please select only JPG/JPEG images.');
+                return;
+            }
+
+            selectedFiles = [...selectedFiles, ...validFiles];
+            updatePreview();
+            convertBtn.disabled = selectedFiles.length === 0;
+        }
+
+        function updatePreview() {
+            previewContainer.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    previewItem.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <button class="remove-btn" onclick="removeFile(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    previewContainer.appendChild(previewItem);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updatePreview();
+            convertBtn.disabled = selectedFiles.length === 0;
+        }
+
+        convertBtn.addEventListener('click', async () => {
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+            formData.append('page_size', document.getElementById('pageSize').value);
+            formData.append('orientation', document.getElementById('orientation').value);
+
+            try {
+                convertBtn.disabled = true;
+                convertBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Converting...';
+
+                const response = await fetch('/convert-jpg-to-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'converted.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Conversion failed');
+                }
+            } catch (error) {
+                alert(error.message || 'An error occurred during conversion');
+            } finally {
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = 'Convert to PDF';
+            }
+        });
+    </script>
+</body>
+</html> 

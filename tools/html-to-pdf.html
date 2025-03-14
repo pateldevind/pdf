@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert HTML to PDF - Multi-Tools Website</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <h1 class="text-center mb-4">Convert HTML to PDF</h1>
+            
+            <!-- Input Section -->
+            <div class="input-section card mb-4">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h5>Choose Input Method</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="inputMethod" id="fileInput" value="file" checked>
+                            <label class="form-check-label" for="fileInput">
+                                Upload HTML File
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="inputMethod" id="urlInput" value="url">
+                            <label class="form-check-label" for="urlInput">
+                                Enter URL
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="inputMethod" id="pasteInput" value="paste">
+                            <label class="form-check-label" for="pasteInput">
+                                Paste HTML Code
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div id="fileSection" class="input-group-section mb-3">
+                        <label for="htmlFile" class="form-label">Select HTML File</label>
+                        <input type="file" class="form-control" id="htmlFile" accept=".html,.htm">
+                        <div class="form-text">Supported formats: .html, .htm</div>
+                    </div>
+
+                    <!-- URL Input -->
+                    <div id="urlSection" class="input-group-section mb-3" style="display: none;">
+                        <label for="urlField" class="form-label">Enter Website URL</label>
+                        <input type="url" class="form-control" id="urlField" placeholder="https://example.com">
+                        <div class="form-text">Enter a valid URL starting with http:// or https://</div>
+                    </div>
+
+                    <!-- HTML Code Input -->
+                    <div id="pasteSection" class="input-group-section mb-3" style="display: none;">
+                        <label for="htmlCode" class="form-label">Paste HTML Code</label>
+                        <textarea class="form-control" id="htmlCode" rows="10" placeholder="<html>...</html>"></textarea>
+                        <div class="form-text">Paste your HTML code here</div>
+                    </div>
+
+                    <!-- Conversion Options -->
+                    <div class="mb-3">
+                        <h5>Conversion Options</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="includeStyles" checked>
+                            <label class="form-check-label" for="includeStyles">
+                                Include CSS styles
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="includeImages" checked>
+                            <label class="form-check-label" for="includeImages">
+                                Include images
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="pageBreaks" checked>
+                            <label class="form-check-label" for="pageBreaks">
+                                Respect page breaks
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loadingIndicator" class="text-center" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Converting to PDF...</p>
+                    </div>
+
+                    <!-- Convert Button -->
+                    <button id="convertBtn" class="btn btn-primary w-100">
+                        <i class="fas fa-file-pdf me-2"></i>Convert to PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-section card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">How to Convert HTML to PDF</h5>
+                    <ol>
+                        <li>Choose your input method:
+                            <ul>
+                                <li>Upload an HTML file</li>
+                                <li>Enter a website URL</li>
+                                <li>Paste HTML code directly</li>
+                            </ul>
+                        </li>
+                        <li>Select conversion options:
+                            <ul>
+                                <li>Include CSS styles: Preserves the original styling</li>
+                                <li>Include images: Downloads and embeds images in the PDF</li>
+                                <li>Respect page breaks: Maintains intended page divisions</li>
+                            </ul>
+                        </li>
+                        <li>Click "Convert to PDF" to start the conversion</li>
+                        <li>Download your converted PDF file when ready</li>
+                    </ol>
+                    <div class="alert alert-info">
+                        <h6>Important Notes:</h6>
+                        <ul class="mb-0">
+                            <li>Maximum file size: 50MB</li>
+                            <li>For URL conversion, ensure the website is publicly accessible</li>
+                            <li>External resources (fonts, images) may affect conversion time</li>
+                            <li>Some complex CSS features may not be fully supported</li>
+                            <li>JavaScript functionality will not be preserved in the PDF</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section -->
+            <div class="ad-section text-center my-4">
+                <div class="ad-placeholder">
+                    <!-- Ad Space -->
+                    <div class="ad-banner">
+                        Advertisement Space
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputMethods = document.getElementsByName('inputMethod');
+            const fileSection = document.getElementById('fileSection');
+            const urlSection = document.getElementById('urlSection');
+            const pasteSection = document.getElementById('pasteSection');
+            const htmlFile = document.getElementById('htmlFile');
+            const urlField = document.getElementById('urlField');
+            const htmlCode = document.getElementById('htmlCode');
+            const convertBtn = document.getElementById('convertBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const includeStyles = document.getElementById('includeStyles');
+            const includeImages = document.getElementById('includeImages');
+            const pageBreaks = document.getElementById('pageBreaks');
+
+            // Handle input method selection
+            inputMethods.forEach(input => {
+                input.addEventListener('change', function() {
+                    fileSection.style.display = 'none';
+                    urlSection.style.display = 'none';
+                    pasteSection.style.display = 'none';
+
+                    switch(this.value) {
+                        case 'file':
+                            fileSection.style.display = 'block';
+                            break;
+                        case 'url':
+                            urlSection.style.display = 'block';
+                            break;
+                        case 'paste':
+                            pasteSection.style.display = 'block';
+                            break;
+                    }
+                });
+            });
+
+            // Handle conversion
+            convertBtn.addEventListener('click', function() {
+                // Get selected input method
+                const method = document.querySelector('input[name="inputMethod"]:checked').value;
+                let data = null;
+                let formData = new FormData();
+
+                // Validate and prepare data based on input method
+                switch(method) {
+                    case 'file':
+                        if (!htmlFile.files[0]) {
+                            showError('Please select an HTML file');
+                            return;
+                        }
+                        if (htmlFile.files[0].size > 50 * 1024 * 1024) {
+                            showError('File size exceeds 50MB limit');
+                            return;
+                        }
+                        formData.append('file', htmlFile.files[0]);
+                        break;
+
+                    case 'url':
+                        if (!urlField.value) {
+                            showError('Please enter a URL');
+                            return;
+                        }
+                        try {
+                            new URL(urlField.value);
+                            formData.append('url', urlField.value);
+                        } catch {
+                            showError('Please enter a valid URL');
+                            return;
+                        }
+                        break;
+
+                    case 'paste':
+                        if (!htmlCode.value.trim()) {
+                            showError('Please enter HTML code');
+                            return;
+                        }
+                        formData.append('html', htmlCode.value);
+                        break;
+                }
+
+                // Add conversion options
+                formData.append('includeStyles', includeStyles.checked);
+                formData.append('includeImages', includeImages.checked);
+                formData.append('pageBreaks', pageBreaks.checked);
+
+                // Show loading indicator
+                loadingIndicator.style.display = 'block';
+                convertBtn.disabled = true;
+                hideError();
+                hideSuccess();
+
+                // Send conversion request
+                fetch('/convert-html-to-pdf', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Conversion failed');
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'converted.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    showSuccess('Conversion successful! Your file is downloading...');
+                })
+                .catch(error => {
+                    showError('An error occurred during conversion. Please try again.');
+                    console.error('Conversion error:', error);
+                })
+                .finally(() => {
+                    loadingIndicator.style.display = 'none';
+                    convertBtn.disabled = false;
+                });
+            });
+
+            // Utility functions
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+            }
+
+            function hideSuccess() {
+                successMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

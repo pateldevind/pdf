@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge PDF Files - Multi-Tools</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h4 mb-0">Merge PDF Files</h1>
+                    </div>
+                    <div class="card-body">
+                        <!-- File Upload Section -->
+                        <div class="upload-section mb-4">
+                            <div class="text-center mb-4">
+                                <i class="fas fa-file-pdf fa-3x text-primary mb-3"></i>
+                                <h2 class="h5">Select PDF Files to Merge</h2>
+                                <p class="text-muted">Choose multiple PDF files to combine them into a single document</p>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <input type="file" class="form-control" id="pdfFiles" multiple accept=".pdf">
+                                <div class="form-text">Maximum file size: 10MB per file</div>
+                            </div>
+
+                            <!-- Selected Files List -->
+                            <div id="selectedFiles" class="list-group mb-3"></div>
+
+                            <!-- Error Container -->
+                            <div id="error-container" class="mb-3"></div>
+
+                            <!-- Success Container -->
+                            <div id="success-container" class="mb-3"></div>
+
+                            <!-- Download and Preview Section -->
+                            <div id="download-section" class="mb-3 d-none">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button id="downloadButton" class="btn btn-success">
+                                        <i class="fas fa-download me-2"></i>Download Merged PDF
+                                    </button>
+                                    <button id="previewButton" class="btn btn-info">
+                                        <i class="fas fa-eye me-2"></i>Preview
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Loading Indicator -->
+                            <div id="loading-indicator" class="text-center d-none">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Processing your files...</p>
+                            </div>
+
+                            <!-- Merge Button -->
+                            <button id="mergeButton" class="btn btn-primary w-100" disabled>
+                                <i class="fas fa-object-group me-2"></i>Merge PDF Files
+                            </button>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="instructions mt-4">
+                            <h3 class="h5">How to Merge PDF Files:</h3>
+                            <ol class="text-muted">
+                                <li>Click the file input or drag and drop PDF files</li>
+                                <li>Select multiple PDF files you want to merge</li>
+                                <li>Arrange them in the desired order</li>
+                                <li>Click the "Merge PDF Files" button</li>
+                                <li>Download your merged PDF file</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ad Section -->
+                <div class="ad-section text-center my-4">
+                    <div class="ad-banner">
+                        Advertisement Space
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('pdfFiles');
+            const selectedFiles = document.getElementById('selectedFiles');
+            const mergeButton = document.getElementById('mergeButton');
+            const loadingIndicator = document.getElementById('loading-indicator');
+
+            // Handle file selection
+            fileInput.addEventListener('change', function() {
+                const { files, errors } = handleFileUpload(this, ['application/pdf']);
+                
+                if (errors.length > 0) {
+                    showError(errors.join('<br>'));
+                    return;
+                }
+
+                // Clear previous files
+                selectedFiles.innerHTML = '';
+                
+                // Display selected files
+                Array.from(files).forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    fileItem.innerHTML = `
+                        <span><i class="fas fa-file-pdf text-primary me-2"></i>${file.name}</span>
+                        <button class="btn btn-sm btn-danger" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    selectedFiles.appendChild(fileItem);
+                });
+
+                // Enable/disable merge button
+                mergeButton.disabled = files.length < 2;
+            });
+
+            // Handle file removal
+            selectedFiles.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-danger')) {
+                    const button = e.target.closest('.btn-danger');
+                    const index = button.dataset.index;
+                    button.closest('.list-group-item').remove();
+                    
+                    // Enable/disable merge button
+                    mergeButton.disabled = selectedFiles.children.length < 2;
+                }
+            });
+
+            // Handle merge
+            mergeButton.addEventListener('click', async function() {
+                try {
+                    loadingIndicator.classList.remove('d-none');
+                    mergeButton.disabled = true;
+
+                    const files = Array.from(fileInput.files);
+                    const mergedPdf = await PDFLib.PDFDocument.create();
+                    let totalPages = 0;
+
+                    for (const file of files) {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+                        totalPages += pdf.getPageCount();
+                        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                        pages.forEach(page => mergedPdf.addPage(page));
+                    }
+
+                    const mergedPdfFile = await mergedPdf.save();
+                    
+                    // Store the merged PDF data
+                    window.mergedPdfData = mergedPdfFile;
+                    
+                    // Show download section
+                    document.getElementById('download-section').classList.remove('d-none');
+                    
+                    showSuccess(`PDF files merged successfully! Total pages: ${totalPages}`);
+                } catch (error) {
+                    showError('Error merging PDF files: ' + error.message);
+                } finally {
+                    loadingIndicator.classList.add('d-none');
+                    mergeButton.disabled = false;
+                }
+            });
+
+            // Handle download button click
+            document.getElementById('downloadButton').addEventListener('click', function() {
+                if (!window.mergedPdfData) {
+                    showError('No merged PDF available. Please merge files first.');
+                    return;
+                }
+
+                const blob = new Blob([window.mergedPdfData], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'merged.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            // Handle preview button click
+            document.getElementById('previewButton').addEventListener('click', function() {
+                if (!window.mergedPdfData) {
+                    showError('No merged PDF available. Please merge files first.');
+                    return;
+                }
+
+                const blob = new Blob([window.mergedPdfData], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+            });
+        });
+    </script>
+</body>
+</html> 

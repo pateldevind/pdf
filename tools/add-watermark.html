@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Watermark - Multi-Tools Website</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Header will be loaded dynamically -->
+    <div id="header-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tool-container">
+            <h1 class="text-center mb-4">Add Watermark</h1>
+            
+            <!-- File Upload Section -->
+            <div class="upload-section card mb-4">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Select PDF File</label>
+                        <input type="file" class="form-control" id="fileInput" accept=".pdf">
+                        <div class="form-text">Maximum file size: 50MB</div>
+                    </div>
+
+                    <!-- Watermark Type -->
+                    <div class="mb-3">
+                        <h5>Watermark Type</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="watermarkType" id="textWatermark" value="text" checked>
+                            <label class="form-check-label" for="textWatermark">
+                                Text Watermark
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="watermarkType" id="imageWatermark" value="image">
+                            <label class="form-check-label" for="imageWatermark">
+                                Image Watermark
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Text Watermark Options -->
+                    <div id="textOptions" class="mb-3">
+                        <div class="mb-3">
+                            <label for="watermarkText" class="form-label">Watermark Text</label>
+                            <input type="text" class="form-control" id="watermarkText" placeholder="Enter watermark text">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="fontSize" class="form-label">Font Size</label>
+                                <select class="form-select" id="fontSize">
+                                    <option value="12">12pt</option>
+                                    <option value="16" selected>16pt</option>
+                                    <option value="20">20pt</option>
+                                    <option value="24">24pt</option>
+                                    <option value="32">32pt</option>
+                                    <option value="48">48pt</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="fontColor" class="form-label">Font Color</label>
+                                <input type="color" class="form-control form-control-color" id="fontColor" value="#000000">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="opacity" class="form-label">Opacity</label>
+                            <input type="range" class="form-range" id="opacity" min="0" max="100" value="50">
+                            <div class="text-center"><span id="opacityValue">50%</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Image Watermark Options -->
+                    <div id="imageOptions" class="mb-3" style="display: none;">
+                        <div class="mb-3">
+                            <label for="watermarkImage" class="form-label">Select Watermark Image</label>
+                            <input type="file" class="form-control" id="watermarkImage" accept="image/*">
+                            <div class="form-text">Supported formats: PNG, JPG, JPEG</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imageOpacity" class="form-label">Image Opacity</label>
+                            <input type="range" class="form-range" id="imageOpacity" min="0" max="100" value="50">
+                            <div class="text-center"><span id="imageOpacityValue">50%</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Watermark Position -->
+                    <div class="mb-3">
+                        <h5>Watermark Position</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="position" class="form-label">Position</label>
+                                <select class="form-select" id="position">
+                                    <option value="center">Center</option>
+                                    <option value="top-left">Top Left</option>
+                                    <option value="top-right">Top Right</option>
+                                    <option value="bottom-left">Bottom Left</option>
+                                    <option value="bottom-right">Bottom Right</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="rotation" class="form-label">Rotation</label>
+                                <select class="form-select" id="rotation">
+                                    <option value="0">0°</option>
+                                    <option value="45">45°</option>
+                                    <option value="90">90°</option>
+                                    <option value="135">135°</option>
+                                    <option value="180">180°</option>
+                                    <option value="225">225°</option>
+                                    <option value="270">270°</option>
+                                    <option value="315">315°</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Page Range -->
+                    <div class="mb-3">
+                        <label for="pageRange" class="form-label">Page Range (Optional)</label>
+                        <input type="text" class="form-control" id="pageRange" placeholder="e.g., 1-5,7,9-12">
+                        <div class="form-text">Leave empty to add watermark to all pages</div>
+                    </div>
+
+                    <!-- File Information -->
+                    <div id="fileInfo" class="mb-3" style="display: none;">
+                        <h5>File Information:</h5>
+                        <p>Name: <span id="fileName"></span></p>
+                        <p>Size: <span id="fileSize"></span></p>
+                        <p>Pages: <span id="pageCount"></span></p>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+                    <!-- Loading Indicator -->
+                    <div id="loadingIndicator" class="text-center" style="display: none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Adding watermark...</p>
+                    </div>
+
+                    <!-- Convert Button -->
+                    <button id="convertBtn" class="btn btn-primary w-100" disabled>
+                        <i class="fas fa-stamp me-2"></i>Add Watermark
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-section card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">How to Add Watermark</h5>
+                    <ol>
+                        <li>Upload your PDF file</li>
+                        <li>Choose between text or image watermark</li>
+                        <li>For text watermark:
+                            <ul>
+                                <li>Enter the watermark text</li>
+                                <li>Select font size and color</li>
+                                <li>Adjust opacity</li>
+                            </ul>
+                        </li>
+                        <li>For image watermark:
+                            <ul>
+                                <li>Upload your watermark image</li>
+                                <li>Adjust opacity</li>
+                            </ul>
+                        </li>
+                        <li>Choose watermark position and rotation</li>
+                        <li>Optionally specify a page range</li>
+                        <li>Click "Add Watermark" to process your file</li>
+                        <li>Download your watermarked PDF when ready</li>
+                    </ol>
+                    <div class="alert alert-info">
+                        <h6>Important Notes:</h6>
+                        <ul class="mb-0">
+                            <li>Maximum file size: 50MB</li>
+                            <li>For image watermarks, use PNG for best results with transparency</li>
+                            <li>Watermarks can be added to specific pages or all pages</li>
+                            <li>The original file will not be modified</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ad Section -->
+            <div class="ad-section text-center my-4">
+                <div class="ad-placeholder">
+                    <!-- Ad Space -->
+                    <div class="ad-banner">
+                        Advertisement Space
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer will be loaded dynamically -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const convertBtn = document.getElementById('convertBtn');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const pageCount = document.getElementById('pageCount');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const watermarkType = document.getElementsByName('watermarkType');
+            const textOptions = document.getElementById('textOptions');
+            const imageOptions = document.getElementById('imageOptions');
+            const watermarkText = document.getElementById('watermarkText');
+            const fontSize = document.getElementById('fontSize');
+            const fontColor = document.getElementById('fontColor');
+            const opacity = document.getElementById('opacity');
+            const opacityValue = document.getElementById('opacityValue');
+            const watermarkImage = document.getElementById('watermarkImage');
+            const imageOpacity = document.getElementById('imageOpacity');
+            const imageOpacityValue = document.getElementById('imageOpacityValue');
+            const position = document.getElementById('position');
+            const rotation = document.getElementById('rotation');
+            const pageRange = document.getElementById('pageRange');
+
+            // Handle watermark type selection
+            watermarkType.forEach(input => {
+                input.addEventListener('change', function() {
+                    textOptions.style.display = this.value === 'text' ? 'block' : 'none';
+                    imageOptions.style.display = this.value === 'image' ? 'block' : 'none';
+                });
+            });
+
+            // Handle opacity slider
+            opacity.addEventListener('input', function() {
+                opacityValue.textContent = this.value + '%';
+            });
+
+            imageOpacity.addEventListener('input', function() {
+                imageOpacityValue.textContent = this.value + '%';
+            });
+
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    if (!file.name.toLowerCase().endsWith('.pdf')) {
+                        showError('Please select a valid PDF file');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Validate file size (50MB max)
+                    if (file.size > 50 * 1024 * 1024) {
+                        showError('File size exceeds 50MB limit');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Show file information
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    fileInfo.style.display = 'block';
+                    convertBtn.disabled = false;
+                    hideError();
+                    hideSuccess();
+                } else {
+                    fileInfo.style.display = 'none';
+                    convertBtn.disabled = true;
+                }
+            });
+
+            // Handle conversion
+            convertBtn.addEventListener('click', function() {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('watermark_type', document.querySelector('input[name="watermarkType"]:checked').value);
+                formData.append('position', position.value);
+                formData.append('rotation', rotation.value);
+                formData.append('page_range', pageRange.value);
+
+                if (document.querySelector('input[name="watermarkType"]:checked').value === 'text') {
+                    if (!watermarkText.value.trim()) {
+                        showError('Please enter watermark text');
+                        return;
+                    }
+                    formData.append('watermark_text', watermarkText.value);
+                    formData.append('font_size', fontSize.value);
+                    formData.append('font_color', fontColor.value);
+                    formData.append('opacity', opacity.value);
+                } else {
+                    if (!watermarkImage.files[0]) {
+                        showError('Please select a watermark image');
+                        return;
+                    }
+                    formData.append('watermark_image', watermarkImage.files[0]);
+                    formData.append('image_opacity', imageOpacity.value);
+                }
+
+                // Show loading indicator
+                loadingIndicator.style.display = 'block';
+                convertBtn.disabled = true;
+                hideError();
+                hideSuccess();
+
+                // Send conversion request
+                fetch('/add-watermark', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to add watermark');
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name.replace('.pdf', '_watermarked.pdf');
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    showSuccess('Watermark added successfully! Your file is downloading...');
+                })
+                .catch(error => {
+                    showError('An error occurred while adding watermark. Please try again.');
+                    console.error('Error:', error);
+                })
+                .finally(() => {
+                    loadingIndicator.style.display = 'none';
+                    convertBtn.disabled = false;
+                });
+            });
+
+            // Utility functions
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+
+            function hideError() {
+                errorMessage.style.display = 'none';
+            }
+
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+            }
+
+            function hideSuccess() {
+                successMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html> 

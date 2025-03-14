@@ -1,0 +1,130 @@
+<!-- Header Component -->
+<header class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-tools"></i>
+            <span>PDF Tools Hub</span>
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation Content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- Search Bar -->
+            <form class="d-flex mx-auto" style="max-width: 400px;">
+                <input class="form-control me-2" type="search" placeholder="Search tools..." id="searchTools">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+
+            <!-- Navigation Links -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown">
+                        Tools
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/tools/create-pdf.html">Create PDF</a></li>
+                        <li><a class="dropdown-item" href="/tools/convert-pdf.html">Convert PDF</a></li>
+                        <li><a class="dropdown-item" href="/tools/edit-pdf.html">Edit PDF</a></li>
+                        <li><a class="dropdown-item" href="/tools/office-to-pdf.html">Office to PDF</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about.html">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact.html">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<!-- Ad Space Below Header -->
+<div class="container mt-5 pt-3">
+    <div class="ad-container text-center mb-4">
+        <div class="ad-space">
+            <!-- AdSense Code Here -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="XXXXXXXXXX"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+        </div>
+    </div>
+</div>
+
+<style>
+    .navbar {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: var(--primary-color);
+    }
+
+    .navbar-brand i {
+        margin-right: 0.5rem;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        color: var(--text-primary);
+        transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: var(--primary-color);
+    }
+
+    .dropdown-menu {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .dropdown-item {
+        padding: 0.5rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown-item:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .ad-container {
+        background: var(--card-background);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+
+    .ad-space {
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+        .navbar-brand {
+            font-size: 1.2rem;
+        }
+
+        .form-control {
+            font-size: 0.9rem;
+        }
+    }
+</style> 
